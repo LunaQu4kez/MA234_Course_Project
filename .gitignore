@@ -1,1 +1,5 @@
-DC_Crime.csv
+origin_material/DC_Crime.csv
+origin_material/DC_Properties.csv
+.idea
+.vscode
+test.py
