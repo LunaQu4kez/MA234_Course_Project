@@ -6,7 +6,7 @@ if __name__ == '__main__':
     df2 = pd.read_csv('..\\..\\data\\task2\\DC_Crime_T.csv')
     df3 = pd.read_csv('..\\..\\data\\task2\\DC_Crime_C.csv')
 
-    col1 = ['NEIGHBORHOOD_CLUSTER', 'CENSUS_TRACT', 'XBLOCK', 'YBLOCK', 'PSA', 'VOTING_PRECINCT', 'ANC']
+    col1 = ['NEIGHBORHOOD_CLUSTER', 'CENSUS_TRACT', 'LONGITUDE', 'LATITUDE', 'PSA', 'VOTING_PRECINCT', 'ANC']
     col2 = ['START_DATE', 'SHIFT']
     col3 = ['offensegroup', 'OFFENSE', 'METHOD', 'ucr-rank', 'CCN']
 

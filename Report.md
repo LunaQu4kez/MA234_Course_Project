@@ -168,8 +168,8 @@ correlation_matrix = df.corr(method='pearson')
 | -------------------- | ------------ | --------------- | ------------ | --------- | ------------ |
 | NEIGHBORHOOD_CLUSTER | 1.22%        | VOTING_PRECINCT | 0.02%        | OFFENSE   | 0            |
 | CENSUS_TRACT         | 0.27%        | ANC             | 0            | METHOD    | 0            |
-| XBLOCK               | 0            | START_DATE      | ≈ 0          | ucr-rank  | 0            |
-| YBLOCK               | 0            | SHIFT           | 0            | CCN       | 0            |
+| LONGITUDE            | 0            | START_DATE      | ≈ 0          | ucr-rank  | 0            |
+| LATITUDE             | 0            | SHIFT           | 0            | CCN       | 0            |
 | PSA                  | 0.05%        | offensegroup    | 0            |           |              |
 
 #### 原子性拆分
@@ -214,5 +214,45 @@ df = pd.get_dummies(df, columns=['SHIFT', 'OFFENSE_GROUP', 'OFFENSE', 'METHOD'])
 
 
 
-## 3. 
+## 3. Correlation between Crime Events and Space and Time
+
+### 3.1 Number of Crime 
+
+(每年每个cluster的crime数量)
+
+
+
+
+
+
+
+### 3.2 Offense of Crime 
+
+(每年每个cluster种类最多的crime)
+
+
+
+
+
+
+
+### 3.3 UCR-Rank of Crime
+
+(每年每个cluster平均ucr-rank)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

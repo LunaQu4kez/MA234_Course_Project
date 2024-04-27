@@ -49,7 +49,7 @@ if __name__ == '__main__':
     df['MONTH'] = df['START_DATE'].apply(month_cal)
     df['DAY'] = df['START_DATE'].apply(day_cal)
 
-    cols = ['NEIGHBORHOOD_CLUSTER', 'CENSUS_TRACT', 'XBLOCK', 'YBLOCK', 'PSA', 'VOTING_PRECINCT', 'ANC1', 'ANC2',
+    cols = ['NEIGHBORHOOD_CLUSTER', 'CENSUS_TRACT', 'LONGITUDE', 'LATITUDE', 'PSA', 'VOTING_PRECINCT', 'ANC1', 'ANC2',
             'YEAR', 'MONTH', 'DAY', 'SHIFT', 'OFFENSE_GROUP', 'OFFENSE', 'METHOD', 'ucr-rank', 'CCN']
     df = df.reindex(columns=cols)
 
