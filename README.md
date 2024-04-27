@@ -17,8 +17,7 @@ MA234_Course_Project
 │   ├── task3                 
 │   └── task4               
 ├── origin_material                                      
-│   ├── DC_Crime.zip              # data of crime           
-│   ├── DC_Properties.csv         # data of properties
+│   ├── project_data.zip          # data used in this project           
 │   └── project2_description.pdf  # project requirement
 ├── vis                           # visualization related
 ├── .gitignore
@@ -36,9 +35,9 @@ MA234_Course_Project
 - Task 2
 
   - [ ] 数据预处理
-    - [ ] 属性分类
-    - [ ] 填补缺失值
-    - [ ] 处理冗余数据
+    - [x] 属性分类
+    - [x] 数据筛选
+    - [x] 预处理
     - [ ] 可视化
 
   - [ ] 属性相关性分析

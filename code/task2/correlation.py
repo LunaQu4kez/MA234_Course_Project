@@ -54,6 +54,7 @@ if __name__ == '__main__':
         df['ANC'] = df['ANC'].astype(str)
         df['ANC'] = df['ANC'].apply(ANC_convert)
 
+        df = df.drop('Unnamed: 0', axis=1)
         correlation_matrix = df.corr(method='pearson')
         print(correlation_matrix)
         correlation_matrix.to_csv('..\\..\\data\\task2\\corr_G.csv')
