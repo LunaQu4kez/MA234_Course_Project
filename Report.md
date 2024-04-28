@@ -8,10 +8,10 @@
 
 ## 0. Group Member
 
-| Name   | Student ID | T2 (1) | T2 (2) | T2 (3) | T2 (4) | T3   | T4   |
-| ------ | ---------- | ------ | ------ | ------ | ------ | ---- | ---- |
-| 赵钊   | 12110120   |        |        |        |        |      |      |
-| 杨皓翔 | 12112523   |        |        |        |        |      |      |
+| Name   | Student ID | T2 (1) | T2 (2) | T2 (3) | T3   | T4   |
+| ------ | ---------- | ------ | ------ | ------ | ---- | ---- |
+| 赵钊   | 12110120   |        |        |        |      |      |
+| 杨皓翔 | 12112523   |        |        |        |      |      |
 
 
 
@@ -125,7 +125,9 @@ correlation_matrix = df.corr(method='pearson')
 
 得到的结果如下图，颜色越深代表相关性越强：
 
-**图！！！**
+<img src=".\\pic\\task2\\2_Corr_Matrix_Heatmap.png" width=500>
+
+
 
 我们认为相关系数大于 0.95 为相关性极强，为冗余变量，因此有以下 4 组冗余变量
 
@@ -214,11 +216,9 @@ df = pd.get_dummies(df, columns=['SHIFT', 'OFFENSE_GROUP', 'OFFENSE', 'METHOD'])
 
 
 
-## 3. Correlation between Crime Events and Space and Time
 
-### 3.1 Number of Crime 
 
-(每年每个cluster的crime数量)
+## 3. Correlation between Different Features
 
 
 
@@ -226,9 +226,114 @@ df = pd.get_dummies(df, columns=['SHIFT', 'OFFENSE_GROUP', 'OFFENSE', 'METHOD'])
 
 
 
-### 3.2 Offense of Crime 
+## 4. Correlation between Crime Events and Space and Time
 
-(每年每个cluster种类最多的crime)
+犯罪的时间有 3 种，分别为 `day`, `evening`, `midnight`；犯罪的事件种类共 9 种，分别为 `arson`, `assault w/dangerous weapon`, `burglary`, `homicide`, `motor vehicle theft`, `robbery`, `sex abuse`, `theft f/auto`, `theft/other` 
+
+下表为 3 个时间的犯罪记录数量，可以看到在 `day` 和 `evening` 犯罪事件的数量相差不多，而在 `midnight` 发生的犯罪事件明显少于 `day` 和 `evening` 
+
+| Shift           | day    | evening | midnight |
+| --------------- | ------ | ------- | -------- |
+| Number of Crime | 167077 | 189015  | 86101    |
+
+对于 `midnight` 时段，统计每个 cluster 发生最多的犯罪类型，计算部分的核心代码如下
+
+```python
+df = pd.read_csv('DC_Crime_Preprocessed.csv')
+crime_counts = df.groupby('NEIGHBORHOOD_CLUSTER')[crime_columns].sum()
+most_common_crime = crime_counts.apply(lambda x: x.idxmax(), axis=1)
+```
+
+<img src=".\\pic\\task2\\3_20.png" width=400>
+
+得到的结果如上图，观察可得
+
+- 偷窃事件发生的最频繁
+- 在华盛顿的中北部抢劫事件也发生较多
+- 在华盛顿的东部和南部危险武器袭击事件较多
+
+<div align="center">
+    <img src=".\\pic\\task2\\3_18.png" alt="" width="270">
+    <img src=".\\pic\\task2\\3_19.png" alt="" width="270">
+</div>
+
+观察 `day` 和 `evening` 时段，容易发现，整个华盛顿 DC 每个 cluster 最常见的犯罪类型都是偷窃，但在晚上偷窃载具较为普遍。
+
+对比 `midnight` 时段，总结并解释现象
+
+- 结合犯罪记录数量，白天的犯罪并没有夜晚多，而白天和夜晚均为偷窃事件最常见，总结为夜晚的环境更有利于偷窃
+- 白天的载具很多都投入了使用，而夜晚处于闲置，因此夜晚更易发生载具偷窃
+- 在午夜，人员活动稀少，因此抢劫和袭击更易发生，与统计数据相吻合
+
+
+
+## 5. Number of Crime & Geographical Districts
+
+### 5.1 Total Number of Crime
+
+<img src=".\\pic\\task2\\3_01.png" width=400>
+
+上图为华盛顿特区每年所记录的犯罪数量随年份变化的柱状图，有如下几点规律
+
+- 2021 年数量远少于其他年份，原因是数据集只包含 2021 年的前几个月
+- 2008 到 2019 年犯罪记录数量有波动，但整体变化不大，基本维持在平均值上下
+- 2020 年的犯罪记录数量有较为明显的下降，可能由于治安等方面的提升导致
+
+
+
+### 5.2 Number of Crime & Cluster
+
+<img src=".\\pic\\task2\\3_02.png" width=800>
+
+华盛顿特区划分为 46 个 cluster，编号分别为 1 到 46. 上面的柱状图统计了每个 cluster 在 2008 到 2021 年记录的犯罪数量。
+
+- 总体来看，cluster 之间的记录数量方差很大
+- cluster 40 到 46 的记录数量可以近似于没有
+
+但由于犯罪数量和 cluster 面积大小也有一定关联，因此我们分析每个 cluster 的犯罪记录密度。以下为 2008 到 2021 年共 14 年，每年各个 cluster 的犯罪密度示意图
+
+<div align="center">
+    <img src=".\\pic\\task2\\3_03.png" alt="" width="190">
+    <img src=".\\pic\\task2\\3_04.png" alt="" width="190">
+    <img src=".\\pic\\task2\\3_05.png" alt="" width="190">
+</div>
+
+<div align="center">
+    <img src=".\\pic\\task2\\3_06.png" alt="" width="190">
+    <img src=".\\pic\\task2\\3_07.png" alt="" width="190">
+    <img src=".\\pic\\task2\\3_08.png" alt="" width="190">
+</div>
+
+<div align="center">
+    <img src=".\\pic\\task2\\3_09.png" alt="" width="190">
+    <img src=".\\pic\\task2\\3_10.png" alt="" width="190">
+    <img src=".\\pic\\task2\\3_11.png" alt="" width="190">
+</div>
+
+<div align="center">
+    <img src=".\\pic\\task2\\3_12.png" alt="" width="190">
+    <img src=".\\pic\\task2\\3_13.png" alt="" width="190">
+    <img src=".\\pic\\task2\\3_14.png" alt="" width="190">
+</div>
+
+<div align="center">
+    <img src=".\\pic\\task2\\3_15.png" alt="" width="190">
+    <img src=".\\pic\\task2\\3_16.png" alt="" width="190">
+    <img src=".\\pic\\task2\\.png" alt="" width="190">
+</div>
+
+可以观察到
+
+- 犯罪记录多集中在城市中心，犯罪记录密度明显大于四周
+- 城市边缘几乎没有记录，可能该区域对应的 cluster 编号为 40 到 46
+
+针对编号为 40 到 46 的 cluster 进行深入研究，加入华盛顿 DC 的建筑分布及水域分布，并标记出记录的犯罪事件，得到的结果如下图
+
+<img src=".\\pic\\task2\\3_17.png" width=500>
+
+- 犯罪多分布在大型建筑或水域周围
+- 大型建筑更可能是一些公共设施，如音乐厅，博物馆等，而非居民住宅区
+- 发生在这类区域的犯罪数量少于居民区，结果较为符合常理
 
 
 
@@ -236,9 +341,7 @@ df = pd.get_dummies(df, columns=['SHIFT', 'OFFENSE_GROUP', 'OFFENSE', 'METHOD'])
 
 
 
-### 3.3 UCR-Rank of Crime
 
-(每年每个cluster平均ucr-rank)
 
 
 
