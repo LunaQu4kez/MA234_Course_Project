@@ -208,23 +208,83 @@ df = pd.get_dummies(df, columns=['SHIFT', 'OFFENSE_GROUP', 'OFFENSE', 'METHOD'])
 
 
 
-### 2.4 预处理后数据的可视化
-
-
-
-
-
-
-
-
-
 ## 3. Correlation between Different Features
 
+在对`SHIFT`, `OFFENSE`, `OFFENSE_GROUP`, `METHOD`这四个类别进行热编码处理之后，我们即可对这四个属性进行相关性分析。首先我们直接计算这些属性的相关性矩阵，并绘制热图。
 
+计算与绘制的核心代码如下：
 
+```python
+index = df.columns.get_loc('SHIFT_day')
+    CA_df = df.iloc[:, index :]
 
+    correlation_matrix = CA_df.corr()
+    correlation_matrix=correlation_matrix.abs()
+    correlation_matrix=correlation_matrix.round(2)
 
+    Heatmap=sns.heatmap(correlation_matrix, annot=True, cmap='Reds', vmin=0, vmax=1,annot_kws={'fontsize': 6})
+    plt.title('Crime Info Correlation Matrix Heatmap  shift-offense-method')
+    plt.xticks(fontsize=6)
+    plt.yticks(fontsize=6)
+    plt.show()
+```
 
+<img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap.png" width=600>
+
+得到的结果如上图，由于我们是通过热编码对四类数据进行预处理，四类数据中的每一种可能的取值都会形成新的一列，故我们在观察热图时只针对从不同属性中独立编码得到的数据之间的关系。由于热编码的特点，同一属性中热编码得到的不同分类之间一定是呈负相关的，这与我们热图表现的结果一致。观察热图得到的部分信息如下：
+
+- 暴力犯罪团体的活动集中在夜晚，而财产犯罪团体的活动集中在白天
+- 杀人案件在夜晚更为频繁，其中枪杀的占比要高于刀，而这两者最为常见
+- 暴力犯罪往往采用枪械，刀等攻击性较强的武器，而财产类犯罪则更偏好其他武器
+- 抢劫相较于其他我们通常认识的财产类犯罪拥有更强的暴力属性，甚至超过了谋杀、纵火等我们通常认为的暴力犯罪
+- 盗窃案件与时间的关系并不大
+
+注意到纵火与盗窃相较于时间的相关性系数都很小，我们针对这两种犯罪进行更细致的分析
+
+<div align="center">
+    <img src=".\\pic\\task2\\2.2_arson_bar.png" alt="" width="270">
+    <img src=".\\pic\\task2\\2.2_Burglary_bar.png" alt="" width="270">
+</div>
+
+上图为纵火案件与盗窃案件发生时段的柱状图，可以看到在 `day` 和 `evening` 盗窃事件的数量相差不多，而在 `midnight` 发生的盗窃事件明显少于 `day` 和 `evening` 。然而在 `midnight` ，总犯罪事件的发生也少于`day` 和 `evening`，故我们得到的相关系数是具有合理性的。而对于纵火案件，我们注意到纵火案件在三种犯罪时间中发生的次数几乎一致，但结合总发生次数，我们可以认为在`midnight`发生纵火案件的占比相较于`day` 和 `evening`更大 。热图中反映的情况可能是因为这类犯罪整体占比较低，导致对应的所有系数均偏小。
+
+接下来我们分析不同属性之间的相关系数是否会随着年份不同发生变化，我们挑选出不同年份的犯罪信息并计算相关系数矩阵、绘制热图。以下为 2008 到 2021 年共 14 年，每年的相关系数矩阵对应的图像
+
+<div align="center">
+    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2008.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2009.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2010.png" alt="" width="190">
+</div>
+
+<div align="center">
+    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2011.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2012.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2013.png" alt="" width="190">
+</div>
+
+<div align="center">
+    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2014.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2015.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2016.png" alt="" width="190">
+</div>
+
+<div align="center">
+    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2017.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2018.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2019.png" alt="" width="190">
+</div>
+
+<div align="center">
+    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2020.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2021.png" alt="" width="190">
+    <img src=".\\pic\\task2\\.png" alt="" width="190">
+</div>
+
+2008-2021年，大部分属性相关性并无明显变化，但仍然可以观察到
+
+- 总体而言暴力犯罪集团的活动始终在夜晚更为常见，但在2016-2020年其活动的与夜晚的相关性有所下降
+- 2008-2020年，抢劫事件与夜晚的相关性几乎逐年增长，可以认为犯罪团体变得更加热衷于在夜晚实施抢劫活动
+- 2008-2021年，暴力犯罪团体与枪械的相关性在升高，同时与刀等锐器的相关性呈波动态势，可以认为暴力犯罪团体的武装力量有所上升。
 
 ## 4. Correlation between Crime Events and Space and Time
 
@@ -261,7 +321,7 @@ most_common_crime = crime_counts.apply(lambda x: x.idxmax(), axis=1)
 
 对比 `midnight` 时段，总结并解释现象
 
-- 结合犯罪记录数量，白天的犯罪并没有夜晚多，而白天和夜晚均为偷窃事件最常见，总结为夜晚的环境更有利于偷窃
+- 结合犯罪记录数量，白天的犯罪并没有夜晚多，而白天和夜晚均为偷窃事件最常见
 - 白天的载具很多都投入了使用，而夜晚处于闲置，因此夜晚更易发生载具偷窃
 - 在午夜，人员活动稀少，因此抢劫和袭击更易发生，与统计数据相吻合
 
@@ -325,7 +385,7 @@ most_common_crime = crime_counts.apply(lambda x: x.idxmax(), axis=1)
 可以观察到
 
 - 犯罪记录多集中在城市中心，犯罪记录密度明显大于四周
-- 城市边缘几乎没有记录，可能该区域对应的 cluster 编号为 40 到 46
+- 城市边缘几乎没有记录，而该区域对应的 cluster 编号为 40 到 46
 
 针对编号为 40 到 46 的 cluster 进行深入研究，加入华盛顿 DC 的建筑分布及水域分布，并标记出记录的犯罪事件，得到的结果如下图
 
