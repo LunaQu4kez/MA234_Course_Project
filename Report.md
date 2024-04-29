@@ -251,34 +251,35 @@ index = df.columns.get_loc('SHIFT_day')
 接下来我们分析不同属性之间的相关系数是否会随着年份不同发生变化，我们挑选出不同年份的犯罪信息并计算相关系数矩阵、绘制热图。以下为 2008 到 2021 年共 14 年，每年的相关系数矩阵对应的图像
 
 <div align="center">
-    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2008.png" alt="" width="190">
-    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2009.png" alt="" width="190">
-    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2010.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Crime Info Correlation Matrix Heatmap  shift-offense-method in 2008.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Crime Info Correlation Matrix Heatmap  shift-offense-method in 2009.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Crime Info Correlation Matrix Heatmap  shift-offense-method in 2010.png" alt="" width="190">
 </div>
 
 <div align="center">
-    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2011.png" alt="" width="190">
-    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2012.png" alt="" width="190">
-    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2013.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Crime Info Correlation Matrix Heatmap  shift-offense-method in 2011.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Crime Info Correlation Matrix Heatmap  shift-offense-method in 2012.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Crime Info Correlation Matrix Heatmap  shift-offense-method in 2013.png" alt="" width="190">
 </div>
 
 <div align="center">
-    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2014.png" alt="" width="190">
-    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2015.png" alt="" width="190">
-    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2016.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Crime Info Correlation Matrix Heatmap  shift-offense-method in 2014.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Crime Info Correlation Matrix Heatmap  shift-offense-method in 2015.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Crime Info Correlation Matrix Heatmap  shift-offense-method in 2016.png" alt="" width="190">
 </div>
 
 <div align="center">
-    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2017.png" alt="" width="190">
-    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2018.png" alt="" width="190">
-    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2019.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Crime Info Correlation Matrix Heatmap  shift-offense-method in 2017.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Crime Info Correlation Matrix Heatmap  shift-offense-method in 2018.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Crime Info Correlation Matrix Heatmap  shift-offense-method in 2019.png" alt="" width="190">
 </div>
 
 <div align="center">
-    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2020.png" alt="" width="190">
-    <img src=".\\pic\\task2\\2.2_Corr_crime_Matrix_Heatmap in 2021.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Crime Info Correlation Matrix Heatmap  shift-offense-method in 2020.png" alt="" width="190">
+    <img src=".\\pic\\task2\\2.2_Crime Info Correlation Matrix Heatmap  shift-offense-method in 2021.png" alt="" width="190">
     <img src=".\\pic\\task2\\.png" alt="" width="190">
 </div>
+
 
 2008-2021年，大部分属性相关性并无明显变化，但仍然可以观察到
 
