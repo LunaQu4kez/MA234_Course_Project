@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
         plt.figure(figsize=(10, 8))
         Heatmap=sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', vmin=-1, vmax=1,annot_kws={'fontsize': 6})
-        plt.title('Crime Info Correlation Matrix Heatmap shift-offense-method in %s'%value)
+        plt.title('Crime Info Correlation Matrix Heatmap  shift-offense-method in %s'%value)
         plt.xticks(fontsize=6)
         plt.yticks(fontsize=6)
 
