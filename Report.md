@@ -37,7 +37,7 @@
 
 ### 2.1 属性分类
 
-`DC_Properties.csv` 中共有 29 个属性，每个属性分别带有一些方面的信息，现在，我们把这 29 个属性分成 3 类，分别为地理相关、时间相关、犯罪相关的属性，分别用 G、T、C 标记。分类的结果如下表：
+`DC_Crime.csv` 中共有 29 个属性，每个属性分别带有一些方面的信息，现在，我们把这 29 个属性分成 3 类，分别为地理相关、时间相关、犯罪相关的属性，分别用 G、T、C 标记。分类的结果如下表：
 
 | Attribute            | Category | Attribute       | Category | Attribute      | Category |
 | -------------------- | -------- | --------------- | -------- | -------------- | -------- |
@@ -52,7 +52,7 @@
 | DISTRICT             | G        | XBLOCK          | G        | LATITUDE       | G        |
 | WARD                 | G        | BLOCK           | G        |                |          |
 
-由于原数据表 `DC_Properties.csv` 中的变量排布较为混杂，因此考虑先按照属性的分类对变量进行分组。使用如下代码将变量划分为 3 组并输出到 3 个文件中，再进行下一步处理。
+由于原数据表 `DC_Crime.csv` 中的变量排布较为混杂，因此考虑先按照属性的分类对变量进行分组。使用如下代码将变量划分为 3 组并输出到 3 个文件中，再进行下一步处理。
 
 ```python
 df = pd.read_csv('DC_Crime.csv')
@@ -403,20 +403,119 @@ most_common_crime = crime_counts.apply(lambda x: x.idxmax(), axis=1)
 
 
 
+## 7. Housing Price Data Preprocessing
+
+### 7.1 属性分类
+
+`DC_Properties.csv` 中共有 48 个属性，每个属性分别带有一些方面的信息，现在，我们仿照在犯罪属性对数据进行的分类，将这 48 个属性分成 3 类，分别为地理位置相关、时间相关、房屋相关的属性，分别用 G、T、F 标记。分类的结果如下表：
+
+| Attribute | Category | Attribute | Category | Attribute         | Category | Attribute       | Category | Attribute          | Category |
+| --------- | -------- | --------- | -------- | ----------------- | -------- | --------------- | -------- | ------------------ | -------- |
+| BATHRM    | F        | STORIES   | F        | CNDTN             | F        | CMPLX_NUM       | F        | ASSESSMENT_SUBNBHD | G        |
+| HF_BATHRM | F        | SALEDATE  | T        | EXTWALL           | F        | LIVING_GBA      | F        | CENSUS_TRACT       | G        |
+| HEAT      | F        | PRICE     | F        | ROOF              | F        | FULLADDRESS     | G        | CENSUS_BLOCK       | G        |
+| AC        | F        | QUALIFIED | F        | INTWALL           | F        | CITY            | G        | WARD               | G        |
+| NUM_UNITS | F        | SALE_NUM  | F        | KITCHENS          | F        | STATE           | G        | SQUARE             | G        |
+| ROOMS     | F        | GBA       | F        | FIREPLACES        | F        | ZIPCODE         | G        | X                  | G        |
+| BEDRM     | F        | BLDG_NUM  | F        | USECODE           | F        | NATIONALGRID    | G        | Y                  | G        |
+| AYB       | T        | STYLE     | F        | LANDAREA          | F        | LATITUDE        | G        | QUADRANT           | G        |
+| YR_RMDL   | T        | STRUCT    | F        | GIS_LAST_MOD_DTTM | T        | LONGITUDE       | G        |                    |          |
+| EYB       | T        | GRADE     | F        | SOURCE            | F        | ASSESSMENT_NBHD | G        |                    |          |
+
+特别的，由于我们需要根据房屋属性以及地区所存在的犯罪属性对房价进行预测，在数据处理时，我们直接删去所有缺失`PRICE` 这一属性的行。
+
+另外，我们注意到一个关键的属性：`SOURCE` 。该属性表示房屋类型，有两个不同的取值：
+
+- `Residential`：该取值表示这一房屋为住宅，不存在`CMPLX_NUM`与`LIVING_GBA`等属性。
+- `Condominium`：该取值表示这一房屋为公寓，不存在`STYLE`等属性。
+
+故我们根据`SOURCE` 将房屋分两类分别进行属性分类，关键代码如下：
+
+```python
+df = pd.read_csv('..\\..\\origin_material\\DC_Properties.csv')
+df = df.dropna(subset=['PRICE'])
+
+df_residential = df[df['SOURCE'] == 'Residential']
+
+df_condominium = df[df['SOURCE'] == 'Condominium']
+
+new_order = ['FULLADDRESS','CITY','STATE','ZIPCODE', 'NATIONALGRID', 'LONGITUDE', 'ASSESSMENT_NBHD', 'ASSESSMENT_SUBNBHD', 'CENSUS_TRACT', 'CENSUS_BLOCK', 'WARD','SQUARE','X','Y','QUADRANT']
+df11 = df_condominium.reindex(columns=new_order)
+df11.to_csv('..\\..\\data\\task4\\DC_Properties_condominium_G.csv', index=True)
+df12=df_residential.reindex(columns=new_order)
+df12.to_csv('..\\..\\data\\task4\\DC_Properties_residential_G.csv', index=True)
+
+new_order = ['AYB', 'YR_RMDL', 'EYB', 'SALEDATE', 'GIS_LAST_MOD_DTTM']
+df21 = df_condominium.reindex(columns=new_order)
+df21.to_csv('..\\..\\data\\task4\\DC_Properties_condominium_T.csv', index=True)
+df22=df_residential.reindex(columns=new_order)
+df22.to_csv('..\\..\\data\\task4\\DC_Properties_residential_T.csv', index=True)
+
+new_order = ['BATHRM', 'HF_BATHRM', 'HEAT', 'AC', 'NUM_UNITS', 'ROOMS', 'BEDRM', 'STORIES','PRICE','QUALIFIED','SALE_NUM',
+             'GBA','BLDG_NUM','STYLE','STRUCT','GRADE','CNDTN','EXTWALL','ROOF','INTWALL','KITCHENS',' FIREPLACES','USECODE','LANDAREA','SOURCE','CMPLX_NUM','LIVING_GBA']
+df31 = df_condominium.reindex(columns=new_order)
+df31.to_csv('..\\..\\data\\task4\\DC_Properties_condominium_F.csv', index=True)
+df32=df_residential.reindex(columns=new_order)
+df32.to_csv('..\\..\\data\\task4\\DC_Properties_residential_F.csv', index=True)
+```
 
 
 
+### 7.2 数据预处理
+
+注意到数据的维数很大，且其中包含大量string类型的数据，因此需要对数据进行预处理。首先，为了减小数据的维度，考虑先对数据的含义以及数据间的相关性进行分析，对该部分进行筛选。
+
+#### 时间信息筛选
+
+首先，删去以下 1 个变量：
+
+- `GIS_LAST_MOD_DTTM`：该变量表示数据的最后修改日期，统一为 ‘2018-07-22 18:01:43’，可以认为是无关变量。
+
+对剩下的变量进行转化：
+
+- `SALEDATE`：该变量表示对应房屋最近一次售卖发生的时间，变量的形式为‘XXXX/XX/X 0:00’，为了简化问题，只保留其中的`YEAR`对应的属性。
 
 
 
+#### 空间信息筛选
+
+从与空间有关的16个变量中，可以发现：
+- `X` 与 `LONGITUDE` ，`Y` 与 `LATITUDE`虽然取值不同，但是现实意义是完全一样的，都表示房屋的经纬度信息。为减小模型的复杂程度，我们选择删去前两者。
+- 对于住宅，所有数据的`STATE` 与 `CITY` 对应的取值都是一致的，均为`WASHINGTON`，`DC` ，这是因为我们取样的区域限制决定的，故这部分属性对结果不具有影响。而公寓没这两项变量没有取值。综合考虑，我们选择删去这两个属性。
+- 住宅的`CENSUS_BLOCK` 的前半部分一定为 `CENSUS_TRACT` ，因此后者为冗余变量。而公寓的`CENSUS_BLOCK`属性空缺，仅存在`CENSUS_TRACT`属性。
+
+结合数据处理的难易程度与前述对犯罪地理位置的分析，最终选取 `LONGITUDE` ， `LATITUDE`，`WARD`与`QUADRANT`作为需要保留的数据，其中`WARD`的取值只需要直接保留数字即可，而`QUADRANT`直接选择独热编码取得八个独立的子属性。
 
 
 
+#### 房屋属性信息筛选
+
+分别考虑住宅与公寓。首先统计缺失值大于50%的属性，由于这部分数据缺失值较多，难以对预测价格时提供有效的帮助，故选择舍去，最终在住宅中得到23个有效属性，公寓中得到14个有效属性：
+- `AC`表示有无制冷，取值为`Y`或`N`，可以直接映射为1或0。
+
+- `QUALIFIED`表示是否具备资格，取值为`Q`或`U`，可以直接映射为1或0。
+
+- `STYLE`表示楼层，楼层数若为半层则可能还具有属性`Fin`。我们选择提取楼层数据，并通过热编码统计`Fin`的信息。不符合该数据组成规律的数据数量小于千分之一，在此忽略不计。
+
+- `HEAT`表示有无供暖，`EXTWALL`，`ROOF`，`INTWALL`分别表示外墙，天花板以及内墙材料，`STRUCT`表示结构，这部分信息种类过于繁多，且难以直接映射处理。为了避免最终的数据维数过大，选择直接舍去。
+
+- `GRADE`与`CNDTN`均为房屋评价，分别有13种以及7种不同的评价，可以直接映射到数字，数字越大表示评价越好。对于住宅等级评价，在我们保留的数据中，有共计1.2%的评价为`Exceptional-D`，`Exceptional-C`，`Exceptional-A`以及`Exceptional-B`，这部分评价含义理解困难，故将其均映射为0，避免其对结果拟合的影响。
+
+这样，便得到了初步处理完毕的数据。再通过计算相关性矩阵制作热图大部分数据处理的方法与第二题中一致，对于变量`Fin`的处理关键代码如下：
+
+```python
+df32 = pd.read_csv('..\\..\\data\\task4\\DC_Properties_residential_F.csv')
+df32['FLOOR'] = df32['STYLE'].str.extract('(\d+)') 
+df32['STYLE_FIN'] = df32['STYLE'].str.replace('Fin', '1', regex=True)
+df32['STYLE_FIN'] = df32['STYLE'].str.replace('Unfin', '0.5', regex=True)
+df32['STYLE_FIN'] = df32['STYLE'].str.replace(r'[^0]', '0', regex=True)
+df32 = df32.drop('STYLE', axis=1)
+```
 
 
 
+<img src=".\\pic\\task4\\4.1_Corr_Matrix_Heatmap_Condominium.png" width=600>
 
+<img src=".\\pic\\task4\\4.1_Corr_Matrix_Heatmap_Residential.png" width=600>
 
-
-
-
+得到的结果如上图。该图像中并不存在相关系数大于95%的数据对，因此我们认为并无冗余变量。注意到在分析公寓的属性的相关性时变量`BLDG_NUM`列的数据出现了空缺，这是因为该列的取值在公寓中均为常数1，与其他变量均无关。最后，将处理结束的几个变量拼接在一起并储存，用以接下来的回归。
