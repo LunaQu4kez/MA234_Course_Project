@@ -398,6 +398,18 @@ most_common_crime = crime_counts.apply(lambda x: x.idxmax(), axis=1)
 
 
 
+## 6. Cluster the Geography by the Crime Events
+
+整个华盛顿共分为 46 个 cluster，而在本任务中，我们将根据犯罪信息对这 46 个 cluster 进行聚类。由于是以犯罪信息为基准进行的聚类，因此首先统计每个 cluster 的犯罪数量，平均危险等级，犯罪时间，犯罪类型和犯罪方式。
+
+筛选处理过后的数据格式如下：
+
+
+
+<img src=".\\pic\\task3\\01.png" width=700>
+
+在进行聚类前，需对数据进行正则化。
+
 
 
 
@@ -409,18 +421,24 @@ most_common_crime = crime_counts.apply(lambda x: x.idxmax(), axis=1)
 
 `DC_Properties.csv` 中共有 48 个属性，每个属性分别带有一些方面的信息，现在，我们仿照在犯罪属性对数据进行的分类，将这 48 个属性分成 3 类，分别为地理位置相关、时间相关、房屋相关的属性，分别用 G、T、F 标记。分类的结果如下表：
 
-| Attribute | Category | Attribute | Category | Attribute         | Category | Attribute       | Category | Attribute          | Category |
-| --------- | -------- | --------- | -------- | ----------------- | -------- | --------------- | -------- | ------------------ | -------- |
-| BATHRM    | F        | STORIES   | F        | CNDTN             | F        | CMPLX_NUM       | F        | ASSESSMENT_SUBNBHD | G        |
-| HF_BATHRM | F        | SALEDATE  | T        | EXTWALL           | F        | LIVING_GBA      | F        | CENSUS_TRACT       | G        |
-| HEAT      | F        | PRICE     | F        | ROOF              | F        | FULLADDRESS     | G        | CENSUS_BLOCK       | G        |
-| AC        | F        | QUALIFIED | F        | INTWALL           | F        | CITY            | G        | WARD               | G        |
-| NUM_UNITS | F        | SALE_NUM  | F        | KITCHENS          | F        | STATE           | G        | SQUARE             | G        |
-| ROOMS     | F        | GBA       | F        | FIREPLACES        | F        | ZIPCODE         | G        | X                  | G        |
-| BEDRM     | F        | BLDG_NUM  | F        | USECODE           | F        | NATIONALGRID    | G        | Y                  | G        |
-| AYB       | T        | STYLE     | F        | LANDAREA          | F        | LATITUDE        | G        | QUADRANT           | G        |
-| YR_RMDL   | T        | STRUCT    | F        | GIS_LAST_MOD_DTTM | T        | LONGITUDE       | G        |                    |          |
-| EYB       | T        | GRADE     | F        | SOURCE            | F        | ASSESSMENT_NBHD | G        |                    |          |
+| Attribute | Category | Attribute         | Category | Attribute          | Category |
+| --------- | -------- | ----------------- | -------- | ------------------ | -------- |
+| BATHRM    | F        | BLDG_NUM          | F        | FULLADDRESS        | G        |
+| HF_BATHRM | F        | STYLE             | F        | CITY               | G        |
+| HEAT      | F        | STRUCT            | F        | STATE              | G        |
+| AC        | F        | GRADE             | F        | ZIPCODE            | G        |
+| NUM_UNITS | F        | CNDTN             | F        | NATIONALGRID       | G        |
+| ROOMS     | F        | EXTWALL           | F        | LATITUDE           | G        |
+| BEDRM     | F        | ROOF              | F        | LONGITUDE          | G        |
+| AYB       | T        | INTWALL           | F        | ASSESSMENT_NBHD    | G        |
+| YR_RMDL   | T        | KITCHENS          | F        | ASSESSMENT_SUBNBHD | G        |
+| EYB       | T        | FIREPLACES        | F        | CENSUS_TRACT       | G        |
+| STORIES   | F        | USECODE           | F        | CENSUS_BLOCK       | G        |
+| SALEDATE  | T        | LANDAREA          | F        | WARD               | G        |
+| PRICE     | F        | GIS_LAST_MOD_DTTM | T        | SQUARE             | G        |
+| QUALIFIED | F        | SOURCE            | F        | X                  | G        |
+| SALE_NUM  | F        | CMPLX_NUM         | F        | Y                  | G        |
+| GBA       | F        | LIVING_GBA        | F        | QUADRANT           | G        |
 
 特别的，由于我们需要根据房屋属性以及地区所存在的犯罪属性对房价进行预测，在数据处理时，我们直接删去所有缺失`PRICE` 这一属性的行。
 
