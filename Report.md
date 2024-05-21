@@ -408,7 +408,32 @@ most_common_crime = crime_counts.apply(lambda x: x.idxmax(), axis=1)
 
 <img src=".\\pic\\task3\\01.png" width=700>
 
-在进行聚类前，需对数据进行正则化。
+在进行聚类前，需对数据进行正则化。**由于数据分布较为均匀且有界，因此选取 Z-Score 归一化来进行正则化。** 
+
+```python
+df_normalized = (df - df.mean()) / df.std()
+```
+
+尝试 K-Means 等聚类算法并进行聚类效果评估。
+
+### K-Means
+
+```python
+features = df.drop('NEIGHBORHOOD_CLUSTER', axis=1)
+scaler = StandardScaler()
+scaled_features = scaler.fit_transform(features.iloc[:, 1:])
+
+kmeans = KMeans(n_clusters=3)
+kmeans.fit(scaled_features)
+
+df['cluster'] = kmeans.labels_
+```
+
+观察到，当分类数量大于 3 时，cluster 41 总会被单独聚类为一类，而若仅分为两类，类别数量过少，因此分类参数选择为 3. 对分类结果进行可视化得到的结果如下
+
+
+
+
 
 
 
