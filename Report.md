@@ -404,8 +404,6 @@ most_common_crime = crime_counts.apply(lambda x: x.idxmax(), axis=1)
 
 筛选处理过后的数据格式如下：
 
-
-
 <img src=".\\pic\\task3\\01.png" width=700>
 
 在进行聚类前，需对数据进行正则化。**由于数据分布较为均匀且有界，因此选取 Z-Score 归一化来进行正则化。** 
@@ -429,13 +427,97 @@ kmeans.fit(scaled_features)
 df['cluster'] = kmeans.labels_
 ```
 
-观察到，当分类数量大于 3 时，cluster 41 总会被单独聚类为一类，而若仅分为两类，类别数量过少，因此分类参数选择为 3. 对分类结果进行可视化得到的结果如下
+观察到，当分类数量大于 3 时，cluster 41 总会被单独聚类为一类，而若仅分为两类，类别数量过少，因此分类参数选择为 3
 
+对分类结果进行可视化得到的结果如下
 
+<img src=".\\pic\\task3\\02.png" width=400>
 
+### Hierarchical Clustering
 
+使用以下核心代码进行 Hierarchical Clustering
 
+```python
+scaler = StandardScaler()
+df_scaled = scaler.fit_transform(df_without_first_column)
 
+distance_matrix = pdist(df_scaled)
+Z = linkage(distance_matrix, method='ward')
+
+dendrogram(Z)
+```
+
+得到树状图如下左图所示。观察可以发现，整体被较为明显的分为 3 类，对结果进行整理并画出地图示意图，如右图
+
+<div align="center">
+    <img src=".\\pic\\task3\\03.png" alt="" height="220">
+    <img src=".\\pic\\task3\\04.png" alt="" height="220">
+</div>
+
+### DBSCAN
+
+```python
+dbscan = DBSCAN(eps=0.7, min_samples=2)
+dbscan.fit(df_scaled)
+```
+
+分别测试参数 eps 为 0.5，0.7，0.9 和 min_sample 为 2，3 时的效果，得到的结果如下
+
+<div align="center">
+    <img src=".\\pic\\task3\\05_1.png" alt="" height="190">
+    <img src=".\\pic\\task3\\05_2.png" alt="" height="190">
+    <img src=".\\pic\\task3\\05_3.png" alt="" height="190">
+</div>
+
+<div align="center">
+    <img src=".\\pic\\task3\\05_4.png" alt="" height="190">
+    <img src=".\\pic\\task3\\05_5.png" alt="" height="190">
+    <img src=".\\pic\\task3\\05_6.png" alt="" height="190">
+</div>
+
+容易观察出，只有 eps = 0.9，min_sample = 2 时的聚类较为可信，DBSCAN 算法在这个问题上的表现相比于前两种聚类算法较差，容易将大量数据点分为同一类别，而聚类出的其他类别数据点十分稀少，**可能原因是数据的密度分布比较不均匀而导致的聚类效果不佳**。
+
+### Spectral Clustering
+
+```python
+gamma = 0.1
+affinity_matrix = rbf_kernel(scaled_features, gamma=gamma)
+
+spectral = SpectralClustering(n_clusters=3, affinity='precomputed', random_state=42)
+spectral.fit(affinity_matrix)
+```
+
+选择聚类类别数量为 3，4，5，结果如下
+
+<div align="center">
+    <img src=".\\pic\\task3\\06.png" alt="" height="190">
+    <img src=".\\pic\\task3\\07.png" alt="" height="190">
+    <img src=".\\pic\\task3\\08.png" alt="" height="190">
+</div>
+
+发现类别数量为 4 和 5 时，得到的结果差异不大，原因是新分类出的类别很小，因此可视化后效果并不明显。
+
+### 不同聚类方法的对比
+
+对比聚类类别数量为 3 时的 K-Means，Hierarchical Clustering 和 Spectral Clustering 算法，其相似度较强。
+
+<div align="center">
+    <img src=".\\pic\\task3\\02.png" alt="" height="190">
+    <img src=".\\pic\\task3\\04.png" alt="" height="190">
+    <img src=".\\pic\\task3\\06.png" alt="" height="190">
+</div>
+
+聚类结果在地理上分为西北、中部、东南，总结特征如下
+
+| 聚类类别 | 犯罪数量 | ucr-rank | 犯罪时间 | 犯罪种类     | 犯罪方式     |
+| -------- | -------- | -------- | -------- | ------------ | ------------ |
+| 西北     | 较少     | 较高     | 午夜较少 | 财产相关较多 | 使用刀枪较少 |
+| 中部     | 较多     | 中等     | 午夜较多 | 财产相关较多 | 使用刀枪较少 |
+| 东南     | 较少     | 较低     | 午夜较多 | 暴力事件较多 | 使用刀枪较多 |
+
+- 西北部犯罪数量少但平均危险系数较高，犯罪事件多集中在白天和晚上，犯罪的性质多为财产相关
+- 中部犯罪较多但危险系数适中，多发生在午夜，犯罪性质多为财产相关
+- 东南部分的主要特征为犯罪数量少且犯罪事件的危险系数 `ucr-rank` 较低，基本不足 6.0，而更多发生在午夜，犯罪性质更接近使用刀枪较多的暴力事件。**但值得一提的是，东南部的犯罪虽然看似更为暴力，发生在午夜且更多使用刀枪，但其危险系数却是最低的。** 猜测可能与犯罪数量很少，数据不全等问题有关。
 
 
 
