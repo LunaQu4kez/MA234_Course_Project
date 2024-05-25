@@ -105,4 +105,4 @@ Processeddf1.to_csv('..\\..\\data\\task4\\Process_Properties_condominium.csv', i
 
 Processeddf2=pd.concat([df12, df22,df32], axis=1)
 Processeddf2 = Processeddf2.fillna(method='ffill')
-Processeddf1.to_csv('..\\..\\data\\task4\\Process_Properties_Residential.csv', index=True)
+Processeddf2.to_csv('..\\..\\data\\task4\\Process_Properties_Residential.csv', index=True)
