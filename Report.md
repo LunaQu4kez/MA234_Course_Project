@@ -547,9 +547,9 @@ spectral.fit(affinity_matrix)
 | SALE_NUM  | F        | CMPLX_NUM         | F        | Y                  | G        |
 | GBA       | F        | LIVING_GBA        | F        | QUADRANT           | G        |
 
-特别的，由于我们需要根据房屋属性以及地区所存在的犯罪属性对房价进行预测，在数据处理时，我们直接删去所有缺失`PRICE` 这一属性的行。
+特别的，由于需要根据房屋属性以及地区所存在的犯罪属性对房价进行预测，在数据处理时，直接删去所有缺失`PRICE` 这一属性的行。
 
-另外，我们注意到一个关键的属性：`SOURCE` 。该属性表示房屋类型，有两个不同的取值：
+另外，注意到一个关键的属性：`SOURCE` 。该属性表示房屋类型，有两个不同的取值：
 
 - `Residential`：该取值表示这一房屋为住宅，不存在`CMPLX_NUM`与`LIVING_GBA`等属性。
 - `Condominium`：该取值表示这一房屋为公寓，不存在`STYLE`等属性。
@@ -606,10 +606,31 @@ df32.to_csv('..\\..\\data\\task4\\DC_Properties_residential_F.csv', index=True)
 
 从与空间有关的16个变量中，可以发现：
 - `X` 与 `LONGITUDE` ，`Y` 与 `LATITUDE`虽然取值不同，但是现实意义是完全一样的，都表示房屋的经纬度信息。为减小模型的复杂程度，我们选择删去前两者。
-- 对于住宅，所有数据的`STATE` 与 `CITY` 对应的取值都是一致的，均为`WASHINGTON`，`DC` ，这是因为我们取样的区域限制决定的，故这部分属性对结果不具有影响。而公寓没这两项变量没有取值。综合考虑，我们选择删去这两个属性。
+- 对于住宅，所有数据的`STATE` 与 `CITY` 对应的取值都是一致的，均为`WASHINGTON`，`DC` ，这是因为取样的区域限制决定的，故这部分属性对结果不具有影响。而公寓没这两项变量没有取值。综合考虑，选择直接删去这两个属性。
 - 住宅的`CENSUS_BLOCK` 的前半部分一定为 `CENSUS_TRACT` ，因此后者为冗余变量。而公寓的`CENSUS_BLOCK`属性空缺，仅存在`CENSUS_TRACT`属性。
 
-结合数据处理的难易程度与前述对犯罪地理位置的分析，最终选取 `LONGITUDE` ， `LATITUDE`，`WARD`与`QUADRANT`作为需要保留的数据，其中`WARD`的取值只需要直接保留数字即可，而`QUADRANT`直接选择独热编码取得八个独立的子属性。
+结合数据处理的难易程度与前述对犯罪地理位置的分析，最终选取 `LONGITUDE` ， `LATITUDE`，`WARD`与`QUADRANT`作为需要保留的数据，其中`WARD`的取值只需要直接保留数字即可，而`QUADRANT`直接选择独热编码取得八个独立的子属性。另外，希望寻找房价与犯罪率之间的关系，可以通过 `LONGITUDE` ， `LATITUDE`这两个属性对将给定房屋的位置通过k-NN算法映射到犯罪率问题中划分的cluster中，并且在给定年份之中，各个cluster犯罪表现差异不大，结合数据处理难度，可以直接忽略年份的影响，通过cluster整体的的犯罪率来为房价预测增添一个新的属性：`crime background`。这个属性描绘了该房屋所在cluster犯罪的潜在发生率。通过这一属性对最终房价回归的影响，来描述犯罪率对于房价的影响。该映射过程的关键代码如下：
+
+```python
+label_encoder = LabelEncoder()
+y_encoded = label_encoder.fit_transform(y)
+knn = KNeighborsClassifier(n_neighbors=5)  
+knn.fit(X, y_encoded)
+
+X_C = df_C[['LONGITUDE', 'LATITUDE']]
+predicted_clusters = knn.predict(X_C)
+X_G = df_G[['LONGITUDE', 'LATITUDE']]
+predicted_clusters_G = knn.predict(X_G)
+
+predicted_clusters_decoded = label_encoder.inverse_transform(predicted_clusters)
+predicted_clusters_decoded_G = label_encoder.inverse_transform(predicted_clusters_G)
+
+df_C['NEIGHBORHOOD_CLUSTER'] = predicted_clusters_decoded
+df_G['NEIGHBORHOOD_CLUSTER'] = predicted_clusters_decoded_G
+
+df_C.to_csv('..\\..\\data\\task4\\Process_Properties_condominium.csv', index=True)
+df_G.to_csv('..\\..\\data\\task4\\Process_Properties_Residential.csv', index=True)
+```
 
 
 
@@ -644,3 +665,44 @@ df32 = df32.drop('STYLE', axis=1)
 <img src=".\\pic\\task4\\4.1_Corr_Matrix_Heatmap_Residential.png" width=600>
 
 得到的结果如上图。该图像中并不存在相关系数大于95%的数据对，因此我们认为并无冗余变量。注意到在分析公寓的属性的相关性时变量`BLDG_NUM`列的数据出现了空缺，这是因为该列的取值在公寓中均为常数1，与其他变量均无关。最后，将处理结束的几个变量拼接在一起并储存，用以接下来的回归。
+
+#### 房屋价格回归
+
+提供的房屋数据共有两种类型，而在本任务中，我们将根据房屋属性以及房屋所在cluster的犯罪信息对房屋价格进行预测。由于我们希望探索犯罪率对房屋价格到底有多大的影响，我们首先通过随机森林方法进行回归。通过不纯度减少的方式计算`feature_importances_`属性，并做出图像。关键代码如下：
+
+```python
+X_C = df_C.drop('PRICE', axis=1)
+y_C = df_C['PRICE']
+
+X_Ctrain, X_Ctest, y_Ctrain, y_Ctest = train_test_split(X_C, y_C, test_size=0.2, random_state=42)
+
+rf = RandomForestRegressor(n_estimators=100, random_state=42)
+
+rf.fit(X_Ctrain, y_Ctrain)
+
+y_Cpred = rf.predict(X_Ctest)
+
+mse_C = mean_squared_error(y_Ctest, y_Cpred)
+print(f"Mean Squared Error: {mse_C}")
+
+importances = rf.feature_importances_
+
+feature_names = X_Ctrain.columns
+
+sorted_indices = importances.argsort()
+
+plt.barh(range(len(sorted_indices)), importances[sorted_indices], align='center')
+plt.yticks(range(len(sorted_indices)), [feature_names[i] for i in sorted_indices])
+plt.xlabel('Feature Importance')
+plt.ylabel('Feature')
+plt.title('Feature Importances')
+plt.show()
+```
+
+注意这里我们导入的数据已经经过标准化处理。得到的特征重要性图像分别如下图所示：
+
+<img src=".\\pic\\task4\\4.3_Feature Importances_Condominium.png" width=600>
+
+<img src=".\\pic\\task4\\4.3_Feature Importances_Residential.png" width=600>
+
+发现对公寓价格影响最大的是`QUALIFIED`这一属性，其次是经度位置。而对住宅而言，`GBA`，即总建筑面积，对于房屋价格影响是最大的。而紧随其后的同样是经度信息。二者的均方误差分别为10^-4以及10^-5次方量级，可以认为回归效果本身是出色的。`QUALIFIED`这一属性可能是指该公寓是否具有出租资格，非法出租与合法出租对于价格的影响是巨大的，而住宅的面积同样对于独栋建筑影响巨大，`GBA`这一属性对于房屋价格影响最大也是意料之中。`LONGITUDE`对于两种房屋的价格都具有巨大影响，我们可以推测华盛顿的东西部地区发展是不平衡的，从上图中的犯罪次数以及其他资料也反映出华盛顿的市中心位于给定数据分布的西北部以及西南部，总体而言西部更为发达。然而无论哪种房屋类型，我们发现犯罪对其价格的影响都是有限的。
