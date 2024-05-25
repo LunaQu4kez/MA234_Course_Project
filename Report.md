@@ -6,16 +6,16 @@
 
 </div>
 
-## 0. Group Member
+## 0. 小组成员
 
-| Name   | Student ID | T2 (1) | T2 (2) | T2 (3) | T3   | T4   |
-| ------ | ---------- | ------ | ------ | ------ | ---- | ---- |
-| 赵钊   | 12110120   |        |        |        |      |      |
-| 杨皓翔 | 12112523   |        |        |        |      |      |
+| Name   | Student ID | Task 2             | Task 3             | Task 4             |
+| ------ | ---------- | ------------------ | ------------------ | ------------------ |
+| 赵钊   | 12110120   | :white_check_mark: | :white_check_mark: |                    |
+| 杨皓翔 | 12112523   | :white_check_mark: |                    | :white_check_mark: |
 
 
 
-## 1. Introduction
+## 1. 背景
 
 在现代社会，犯罪问题是一个普遍存在的社会现象，它不仅关系到经济、文化、政治和技术的发展，更直接影响到人民的幸福感和社会的稳定。华盛顿特区（DC）作为美国首都，其犯罪数据的分析对于理解犯罪模式、预防犯罪行为以及提升公共安全具有重要意义。本项目旨在通过深入分析2008年至2017年DC地区的犯罪数据，运用数据挖掘技术揭示其中的潜在信息，并探索犯罪与住房价格之间的关系，以期为政策制定者和社会规划者提供数据支持和决策参考。
 
@@ -33,7 +33,7 @@
 
 
 
-## 2. Data Preprocessing
+## 2. 数据预处理
 
 ### 2.1 属性分类
 
@@ -69,8 +69,6 @@ new_order = ['offensegroup', 'offense-text', 'offensekey', 'ucr-rank', 'CCN', 'O
 df3 = df.reindex(columns=new_order)
 df3.to_csv('DC_Crime_C.csv', index=True)
 ```
-
-
 
 ### 2.2 数据筛选
 
@@ -158,8 +156,6 @@ correlation_matrix = df.corr(method='pearson')
 
 根据以上，选择 `offensegroup` , `OFFENSE`, `ucr-rank`, `CCN`, `METHOD` 作为描述犯罪信息的变量
 
- 
-
 ### 2.3 预处理
 
 #### 缺失值处理
@@ -208,7 +204,7 @@ df = pd.get_dummies(df, columns=['SHIFT', 'OFFENSE_GROUP', 'OFFENSE', 'METHOD'])
 
 
 
-## 3. Correlation between Different Features
+## 3. 属性相关性分析
 
 在对`SHIFT`, `OFFENSE`, `OFFENSE_GROUP`, `METHOD`这四个类别进行热编码处理之后，我们即可对这四个属性进行相关性分析。首先我们直接计算这些属性的相关性矩阵，并绘制热图。
 
@@ -287,7 +283,9 @@ index = df.columns.get_loc('SHIFT_day')
 - 2008-2020年，抢劫事件与夜晚的相关性几乎逐年增长，可以认为犯罪团体变得更加热衷于在夜晚实施抢劫活动
 - 2008-2021年，暴力犯罪团体与枪械的相关性在升高，同时与刀等锐器的相关性呈波动态势，可以认为暴力犯罪团体的武装力量有所上升。
 
-## 4. Correlation between Crime Events and Space and Time
+
+
+## 4. 犯罪事件与时间、空间关联性分析
 
 犯罪的时间有 3 种，分别为 `day`, `evening`, `midnight`；犯罪的事件种类共 9 种，分别为 `arson`, `assault w/dangerous weapon`, `burglary`, `homicide`, `motor vehicle theft`, `robbery`, `sex abuse`, `theft f/auto`, `theft/other` 
 
@@ -328,9 +326,9 @@ most_common_crime = crime_counts.apply(lambda x: x.idxmax(), axis=1)
 
 
 
-## 5. Number of Crime & Geographical Districts
+## 5. 犯罪数量与地理区域关联性分析
 
-### 5.1 Total Number of Crime
+### 5.1 总犯罪数量
 
 <img src=".\\pic\\task2\\3_01.png" width=400>
 
@@ -340,9 +338,7 @@ most_common_crime = crime_counts.apply(lambda x: x.idxmax(), axis=1)
 - 2008 到 2019 年犯罪记录数量有波动，但整体变化不大，基本维持在平均值上下
 - 2020 年的犯罪记录数量有较为明显的下降，可能由于治安等方面的提升导致
 
-
-
-### 5.2 Number of Crime & Cluster
+### 5.2 不同街区犯罪数量
 
 <img src=".\\pic\\task2\\3_02.png" width=800>
 
@@ -398,7 +394,7 @@ most_common_crime = crime_counts.apply(lambda x: x.idxmax(), axis=1)
 
 
 
-## 6. Cluster the Geography by the Crime Events
+## 6. 地理区域分类
 
 整个华盛顿共分为 46 个 cluster，而在本任务中，我们将根据犯罪信息对这 46 个 cluster 进行聚类。由于是以犯罪信息为基准进行的聚类，因此首先统计每个 cluster 的犯罪数量，平均危险等级，犯罪时间，犯罪类型和犯罪方式。
 
@@ -414,7 +410,7 @@ df_normalized = (df - df.mean()) / df.std()
 
 尝试 K-Means 等聚类算法并进行聚类效果评估。
 
-### K-Means
+### 6.1 K-Means
 
 ```python
 features = df.drop('NEIGHBORHOOD_CLUSTER', axis=1)
@@ -433,7 +429,7 @@ df['cluster'] = kmeans.labels_
 
 <img src=".\\pic\\task3\\02.png" width=400>
 
-### Hierarchical Clustering
+### 6.2 Hierarchical Clustering
 
 使用以下核心代码进行 Hierarchical Clustering
 
@@ -454,7 +450,7 @@ dendrogram(Z)
     <img src=".\\pic\\task3\\04.png" alt="" height="220">
 </div>
 
-### DBSCAN
+### 6.3 DBSCAN
 
 ```python
 dbscan = DBSCAN(eps=0.7, min_samples=2)
@@ -477,7 +473,7 @@ dbscan.fit(df_scaled)
 
 容易观察出，只有 eps = 0.9，min_sample = 2 时的聚类较为可信，DBSCAN 算法在这个问题上的表现相比于前两种聚类算法较差，容易将大量数据点分为同一类别，而聚类出的其他类别数据点十分稀少，**可能原因是数据的密度分布比较不均匀而导致的聚类效果不佳**。
 
-### Spectral Clustering
+### 6.4 Spectral Clustering
 
 ```python
 gamma = 0.1
@@ -497,7 +493,7 @@ spectral.fit(affinity_matrix)
 
 发现类别数量为 4 和 5 时，得到的结果差异不大，原因是新分类出的类别很小，因此可视化后效果并不明显。
 
-### 不同聚类方法的对比
+### 6.5 不同聚类方法的对比
 
 对比聚类类别数量为 3 时的 K-Means，Hierarchical Clustering 和 Spectral Clustering 算法，其相似度较强。
 
@@ -522,7 +518,7 @@ spectral.fit(affinity_matrix)
 
 
 
-## 7. Housing Price Data Preprocessing
+## 7. 房价数据预处理
 
 ### 7.1 属性分类
 
@@ -584,8 +580,6 @@ df32=df_residential.reindex(columns=new_order)
 df32.to_csv('..\\..\\data\\task4\\DC_Properties_residential_F.csv', index=True)
 ```
 
-
-
 ### 7.2 数据预处理
 
 注意到数据的维数很大，且其中包含大量string类型的数据，因此需要对数据进行预处理。首先，为了减小数据的维度，考虑先对数据的含义以及数据间的相关性进行分析，对该部分进行筛选。
@@ -599,8 +593,6 @@ df32.to_csv('..\\..\\data\\task4\\DC_Properties_residential_F.csv', index=True)
 对剩下的变量进行转化：
 
 - `SALEDATE`：该变量表示对应房屋最近一次售卖发生的时间，变量的形式为‘XXXX/XX/X 0:00’，为了简化问题，只保留其中的`YEAR`对应的属性。
-
-
 
 #### 空间信息筛选
 
@@ -632,8 +624,6 @@ df_C.to_csv('..\\..\\data\\task4\\Process_Properties_condominium.csv', index=Tru
 df_G.to_csv('..\\..\\data\\task4\\Process_Properties_Residential.csv', index=True)
 ```
 
-
-
 #### 房屋属性信息筛选
 
 分别考虑住宅与公寓。首先统计缺失值大于50%的属性，由于这部分数据缺失值较多，难以对预测价格时提供有效的帮助，故选择舍去，最终在住宅中得到23个有效属性，公寓中得到14个有效属性：
@@ -660,13 +650,15 @@ df32 = df32.drop('STYLE', axis=1)
 
 
 
-<img src=".\\pic\\task4\\4.1_Corr_Matrix_Heatmap_Condominium.png" width=600>
+<img src=".\\pic\\task4\\4.1_Corr_Matrix_Heatmap_Condominium.png" width=400>
 
 <img src=".\\pic\\task4\\4.1_Corr_Matrix_Heatmap_Residential.png" width=600>
 
 得到的结果如上图。该图像中并不存在相关系数大于95%的数据对，因此我们认为并无冗余变量。注意到在分析公寓的属性的相关性时变量`BLDG_NUM`列的数据出现了空缺，这是因为该列的取值在公寓中均为常数1，与其他变量均无关。最后，将处理结束的几个变量拼接在一起并储存，用以接下来的回归。
 
-#### 房屋价格回归
+
+
+## 8. 房屋价格预测
 
 提供的房屋数据共有两种类型，而在本任务中，我们将根据房屋属性以及房屋所在cluster的犯罪信息对房屋价格进行预测。由于我们希望探索犯罪率对房屋价格到底有多大的影响，我们首先通过随机森林方法进行回归。通过不纯度减少的方式计算`feature_importances_`属性，并做出图像。关键代码如下：
 
@@ -705,4 +697,4 @@ plt.show()
 
 <img src=".\\pic\\task4\\4.3_Feature Importances_Residential.png" width=600>
 
-发现对公寓价格影响最大的是`QUALIFIED`这一属性，其次是经度位置。而对住宅而言，`GBA`，即总建筑面积，对于房屋价格影响是最大的。而紧随其后的同样是经度信息。二者的均方误差分别为10^-4以及10^-5次方量级，可以认为回归效果本身是出色的。`QUALIFIED`这一属性可能是指该公寓是否具有出租资格，非法出租与合法出租对于价格的影响是巨大的，而住宅的面积同样对于独栋建筑影响巨大，`GBA`这一属性对于房屋价格影响最大也是意料之中。`LONGITUDE`对于两种房屋的价格都具有巨大影响，我们可以推测华盛顿的东西部地区发展是不平衡的，从上图中的犯罪次数以及其他资料也反映出华盛顿的市中心位于给定数据分布的西北部以及西南部，总体而言西部更为发达。然而无论哪种房屋类型，我们发现犯罪对其价格的影响都是有限的。
+发现对公寓价格影响最大的是 `QUALIFIED` 这一属性，其次是经度位置。而对住宅而言，`GBA`，即总建筑面积，对于房屋价格影响是最大的。而紧随其后的同样是经度信息。二者的均方误差分别为 10^-4^ 以及 10^-5^ 次方量级，可以认为回归效果本身是出色的。`QUALIFIED` 这一属性可能是指该公寓是否具有出租资格，非法出租与合法出租对于价格的影响是巨大的，而住宅的面积同样对于独栋建筑影响巨大，`GBA`这一属性对于房屋价格影响最大也是意料之中。`LONGITUDE` 对于两种房屋的价格都具有巨大影响，我们可以推测华盛顿的东西部地区发展是不平衡的，从上图中的犯罪次数以及其他资料也反映出华盛顿的市中心位于给定数据分布的西北部以及西南部，总体而言西部更为发达。然而无论哪种房屋类型，我们发现犯罪对其价格的影响都是有限的。

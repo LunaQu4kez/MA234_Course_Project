@@ -18,7 +18,7 @@ MA234_Course_Project
 │   └── task4               
 ├── origin_material                                      
 │   ├── project_data.zip          # data used in this project           
-│   └── project2_description.pdf  # project requirement                          # visualization related
+│   └── project2_description.pdf  # project requirement 
 ├── .gitignore
 ├── LICENSE                       # MIT License
 ├── README.md
@@ -44,6 +44,6 @@ MA234_Course_Project
 
   - [x] 犯罪数量与地理区域关联性分析
 - Task 3
-  - [ ] 地理区域分类
+  - [x] 地理区域分类
 - Task 4
-  - [ ] 房价预测
+  - [x] 房价预测
